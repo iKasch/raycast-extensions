@@ -17,7 +17,7 @@
 
 ### TypeScript & Types
 - Strict TypeScript enabled - all types must be explicit
-- Use `interface` for object shapes, `type` for unions/aliases
+- Use `type` for object shapes and unions/aliases
 - Export types with PascalCase (e.g., `VideoDataTypes`, `RaycastPreferences`)
 - Prefer `type` imports for better tree-shaking
 
