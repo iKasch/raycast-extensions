@@ -1,6 +1,6 @@
 # Summarize YouTube Video Changelog
 
-## [Fix] - {PR_MERGE_DATE}
+## [Fix] - 2025-10-10
 
 - Update the way transscriptions is handled
 
