@@ -1,5 +1,9 @@
 # Summarize YouTube Video Changelog
 
+## [Fix] - {PR_MERGE_DATE}
+
+- Update the way transscriptions is handled
+
 ## [Fixes] - 2025-06-27
 
 - 📚 Remove `youtube-transcript` package and install `youtube-transcript-api`
