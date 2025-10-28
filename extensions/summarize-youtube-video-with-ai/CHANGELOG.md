@@ -1,6 +1,6 @@
 # Summarize YouTube Video Changelog
 
-## [Feat] - {PR_MERGE_DATE}
+## [Feat] - 2025-10-28
 
 - 🖼️ Added Support for Windows
 
