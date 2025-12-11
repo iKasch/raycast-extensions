@@ -1,6 +1,6 @@
 #  Zed Recent Projects Changelog
 
-## [Enhancements] - 2025-12-11
+## [Enhancements] - {PR_MERGE_DATE}
 
 - Added support for multi-folder workspaces
 
