@@ -1,5 +1,9 @@
 #  Zed Recent Projects Changelog
 
+## [Enhancements] - 2025-12-11
+
+- Added support for multi-folder workspaces
+
 ## [Update] - 2025-11-03
 
 Update to @raycast/api 1.103, fix types, and add tests to Zed db schema v30.
