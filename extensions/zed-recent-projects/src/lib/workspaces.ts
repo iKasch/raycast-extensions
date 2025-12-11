@@ -34,6 +34,7 @@ export interface Workspace {
   path: string;
   uri: string;
   host?: string;
+  allPaths?: string[];
 }
 
 export function parseZedWorkspace(zedWorkspace: ZedWorkspace): Workspace | null {
@@ -46,10 +47,11 @@ export function parseZedWorkspace(zedWorkspace: ZedWorkspace): Workspace | null 
     .map((p) => p.trim())
     .filter((p) => p);
 
-  if (paths.length !== 1) {
+  if (paths.length === 0) {
     return null;
   }
 
+  // Use first path as primary path
   const path = paths[0];
 
   if (zedWorkspace.type === "local") {
@@ -60,6 +62,7 @@ export function parseZedWorkspace(zedWorkspace: ZedWorkspace): Workspace | null 
       type: zedWorkspace.type,
       uri: "file://" + processedPath,
       path: processedPath,
+      allPaths: paths.length > 1 ? paths : undefined,
     };
   }
 

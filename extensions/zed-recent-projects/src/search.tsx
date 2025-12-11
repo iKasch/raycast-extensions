@@ -5,6 +5,8 @@ import { Entry, getEntry } from "./lib/entry";
 import { EntryItem } from "./components/entry-item";
 import { usePinnedEntries } from "./hooks/use-pinned-entries";
 import { useRecentWorkspaces } from "./hooks/use-recent-workspaces";
+import { openInZed } from "./lib/zed";
+import { zedBuild } from "./lib/preferences";
 
 export function Command() {
   const { app, dbPath, workspaceDbVersion } = useZedContext();
@@ -49,7 +51,7 @@ export function Command() {
               entry={entry}
               actions={
                 <ActionPanel>
-                  <Action.Open title="Open in Zed" target={entry.uri} application={app} icon={zedIcon} />
+                  <Action title="Open in Zed" icon={zedIcon} onAction={() => openInZed(entry, zedBuild)} />
                   {entry.type === "local" && <Action.ShowInFinder path={entry.path} />}
                   <Action
                     title="Unpin Entry"
@@ -70,7 +72,10 @@ export function Command() {
                       title="Move Down"
                       icon={Icon.ArrowDown}
                       onAction={() => moveDown(entry)}
-                      shortcut={{ modifiers: ["cmd", "shift"], key: "arrowDown" }}
+                      shortcut={{
+                        modifiers: ["cmd", "shift"],
+                        key: "arrowDown",
+                      }}
                     />
                   ) : null}
                   <RemoveActionSection
@@ -101,7 +106,7 @@ export function Command() {
                 entry={entry}
                 actions={
                   <ActionPanel>
-                    <Action.Open title="Open in Zed" target={entry.uri} application={app} icon={zedIcon} />
+                    <Action title="Open in Zed" icon={zedIcon} onAction={() => openInZed(entry, zedBuild)} />
                     {entry.type === "local" && <Action.ShowInFinder path={entry.path} />}
                     <Action
                       title="Pin Entry"
