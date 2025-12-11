@@ -56,14 +56,19 @@ export function parseZedWorkspace(zedWorkspace: ZedWorkspace): Workspace | null 
 
   if (zedWorkspace.type === "local") {
     const processedPath = path.replace(/\/+$/, "");
-    return {
+    const workspace: Workspace = {
       id: zedWorkspace.id,
       lastOpened: zedWorkspace.timestamp,
       type: zedWorkspace.type,
       uri: "file://" + processedPath,
       path: processedPath,
-      allPaths: paths.length > 1 ? paths : undefined,
     };
+
+    if (paths.length > 1) {
+      workspace.allPaths = paths;
+    }
+
+    return workspace;
   }
 
   if (zedWorkspace.type === "remote") {
@@ -72,7 +77,7 @@ export function parseZedWorkspace(zedWorkspace: ZedWorkspace): Workspace | null 
       zedWorkspace.port ? ":" + zedWorkspace.port : ""
     }/${processedPath}`;
 
-    return {
+    const workspace: Workspace = {
       id: zedWorkspace.id,
       lastOpened: zedWorkspace.timestamp,
       type: zedWorkspace.type,
@@ -80,6 +85,12 @@ export function parseZedWorkspace(zedWorkspace: ZedWorkspace): Workspace | null 
       path: processedPath,
       host: zedWorkspace.host,
     };
+
+    if (paths.length > 1) {
+      workspace.allPaths = paths.map((p) => p.replace(/^\/+/, "").replace(/\/+$/, ""));
+    }
+
+    return workspace;
   }
 
   return null;

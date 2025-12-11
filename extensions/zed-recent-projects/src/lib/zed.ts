@@ -1,4 +1,4 @@
-import { closeMainWindow, getPreferenceValues, popToRoot } from "@raycast/api";
+import { closeMainWindow, getPreferenceValues, popToRoot, showToast, Toast, open } from "@raycast/api";
 import { exec } from "child_process";
 import { homedir } from "os";
 import { promisify } from "util";
@@ -45,18 +45,34 @@ export function getZedCli(build: ZedBuild): string {
   return ZedCliMapping[build];
 }
 
-export async function openInZed(entry: Entry, build: ZedBuild): Promise<void> {
-  const cli = getZedCli(build);
-
-  // Execute Zed command in background with & so it detaches
-  if (entry.allPaths && entry.allPaths.length > 1) {
-    const paths = entry.allPaths.map((p) => `"${p}"`).join(" ");
-    execAsync(`${cli} ${paths} > /dev/null 2>&1 &`);
-  } else {
-    execAsync(`${cli} "${entry.path}" > /dev/null 2>&1 &`);
+export async function openMultiFolderInZed(entry: Entry, build: ZedBuild): Promise<void> {
+  if (!entry.allPaths || entry.allPaths.length <= 1) {
+    throw new Error("Not a multi-folder workspace");
   }
 
-  // Clear navigation stack and close Raycast window immediately
-  await popToRoot();
-  await closeMainWindow();
+  const cli = getZedCli(build);
+  const paths = entry.allPaths.map((p) => `"${p}"`).join(" ");
+
+  try {
+    // Try to execute Zed CLI command in background
+    await execAsync(`command -v ${cli} > /dev/null 2>&1`);
+    execAsync(`${cli} ${paths} > /dev/null 2>&1 &`);
+
+    // Clear navigation stack and close Raycast window immediately
+    await popToRoot();
+    await closeMainWindow();
+  } catch {
+    // CLI not found - show error and fall back to opening first folder
+    await showToast({
+      style: Toast.Style.Failure,
+      title: "Zed CLI not found",
+      message: "Opening first folder only. Install CLI via Zed > Install CLI",
+    });
+
+    // Fall back to opening first folder with native method
+    const bundleId = getZedBundleId(build);
+    await open(entry.uri, bundleId);
+    await popToRoot();
+    await closeMainWindow();
+  }
 }
