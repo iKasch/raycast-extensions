@@ -416,6 +416,7 @@
     "date-fns": "^4.1.0",
     "node-fetch": "^3.3.2",
     "openai": "^5.1.0",
+    "youtube-transcript": "^1.2.1",
     "ytdl-core": "^4.11.5"
   },
   "devDependencies": {
@@ -432,6 +433,7 @@
     "dev": "ray develop",
     "fix-lint": "ray lint --fix",
     "lint": "ray lint",
-    "publish": "npx @raycast/api@latest publish"
+    "publish": "npx @raycast/api@latest publish",
+    "test:transcript": "npx tsx test/transcript.test.ts"
   }
 }
