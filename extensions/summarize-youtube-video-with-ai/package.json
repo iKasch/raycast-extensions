@@ -412,11 +412,9 @@
   "dependencies": {
     "@anthropic-ai/sdk": "^0.71.2",
     "@raycast/api": "^1.104.3",
-    "@raycast/utils": "^2.2.2",
     "date-fns": "^4.1.0",
     "node-fetch": "^3.3.2",
     "openai": "^6.16.0",
-    "youtube-transcript": "^1.2.1",
     "ytdl-core": "^4.11.5"
   },
   "devDependencies": {
