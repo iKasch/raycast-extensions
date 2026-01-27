@@ -1,6 +1,6 @@
 # Summarize YouTube Video Changelog
 
-## [Fix] - {PR_MERGE_DATE}
+## [Fix] - 2026-01-27
 
 - 🔧 Fix transcript fetching using ANDROID client API
 - ⬆️ Upgraded dependencies
