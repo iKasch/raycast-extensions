@@ -101,7 +101,7 @@ export default function FollowUpList({
       selectedItemId={selectedQuestionId}
       searchBarAccessory={
         <ActionPanel>
-          <Action.SubmitForm onSubmit={handleAdditionalQuestion} />
+          <Action.SubmitForm onSubmit={handleAdditionalQuestion} title="Ask" />
           <Action.CopyToClipboard title="Copy Selected Answer" content={copySelectedAnswer()} />
           <Action.CopyToClipboard title="Copy All Q&A" content={copyQuestionsAndAnswers()} />
         </ActionPanel>
