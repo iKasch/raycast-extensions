@@ -70,9 +70,11 @@ export function useOllamaFollowUpQuestion({
       stream.on("content", (delta) => {
         if (cancelled) return;
         toast.show();
-        setQuestions((prevQuestions) =>
-          prevQuestions.map((q) => (q.id === qID ? { ...q, answer: q.answer + delta } : q)),
-        );
+        setQuestions((prevQuestions) => {
+          const updated = prevQuestions.slice();
+          updated[0] = { ...updated[0], answer: updated[0].answer + delta };
+          return updated;
+        });
       });
 
       stream.on("error", (error) => {

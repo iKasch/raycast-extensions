@@ -59,9 +59,11 @@ export function useRaycastFollowUpQuestion({
       stream.on("data", (data) => {
         if (cancelled) return;
         toast.show();
-        setQuestions((prevQuestions) =>
-          prevQuestions.map((q) => (q.id === qID ? { ...q, answer: q.answer + data } : q)),
-        );
+        setQuestions((prevQuestions) => {
+          const updated = prevQuestions.slice();
+          updated[0] = { ...updated[0], answer: updated[0].answer + data };
+          return updated;
+        });
       });
 
       stream.finally(() => {
