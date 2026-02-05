@@ -12,11 +12,7 @@ type GetAnthropicSummaryProps = {
   setSummary: React.Dispatch<React.SetStateAction<string | undefined>>;
 };
 
-export const useAnthropicSummary = ({
-  transcript,
-  setSummaryIsLoading,
-  setSummary,
-}: GetAnthropicSummaryProps) => {
+export const useAnthropicSummary = ({ transcript, setSummaryIsLoading, setSummary }: GetAnthropicSummaryProps) => {
   const preferences = getPreferenceValues() as AnthropicPreferences;
   const { anthropicApiToken, language, anthropicModel, creativity } = preferences;
 

@@ -96,5 +96,15 @@ export function useOpenAIFollowUpQuestion({
       cancelled = true;
       abortController.abort();
     };
-  }, [question, transcript, questions, creativity, openaiApiToken, openaiEndpoint, openaiModel, setQuestion, setQuestions]);
+  }, [
+    question,
+    transcript,
+    questions,
+    creativity,
+    openaiApiToken,
+    openaiEndpoint,
+    openaiModel,
+    setQuestion,
+    setQuestions,
+  ]);
 }

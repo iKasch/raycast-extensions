@@ -53,9 +53,7 @@ export default function FollowUpList({
         toast.show();
         isFirstChunk = false;
       }
-      setQuestions((prev) =>
-        prev.map((q) => (q.id === qID ? { ...q, answer: q.answer + data } : q))
-      );
+      setQuestions((prev) => prev.map((q) => (q.id === qID ? { ...q, answer: q.answer + data } : q)));
     });
 
     stream.finally(() => {
@@ -97,12 +95,7 @@ export default function FollowUpList({
       }
     >
       {questions.map((q) => (
-        <List.Item
-          key={q.id}
-          title={q.question}
-          detail={<List.Item.Detail markdown={q.answer} />}
-          id={q.id}
-        />
+        <List.Item key={q.id} title={q.question} detail={<List.Item.Detail markdown={q.answer} />} id={q.id} />
       ))}
     </List>
   );
