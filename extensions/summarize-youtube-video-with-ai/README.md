@@ -36,7 +36,7 @@ Choose the OpenAI endpoint you want to use.
 
 ### OpenAI Model
 
-Choose the model you want to use. (default: `gpt-5.1-mini`).
+Choose the model you want to use. (default: `gpt-5-mini`).
 
 ### Language
 
@@ -54,7 +54,7 @@ Your Anthropic API Key. You can get one [here](https://console.anthropic.com/das
 
 ### Anthropic Model
 
-Choose the model you want to use. (default: `claude-3-5-sonnet-latest`).
+Choose the model you want to use. (default: `claude-haiku-4-5`).
 
 ### Language
 
