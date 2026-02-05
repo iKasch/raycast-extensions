@@ -297,17 +297,17 @@
     }
   ],
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.71.2",
-    "@raycast/api": "^1.104.3",
+    "@anthropic-ai/sdk": "^0.72.1",
+    "@raycast/api": "^1.104.4",
     "date-fns": "^4.1.0",
     "node-fetch": "^3.3.2",
-    "openai": "^6.16.0",
+    "openai": "^6.17.0",
     "ytdl-core": "^4.11.5"
   },
   "devDependencies": {
     "@raycast/eslint-config": "^2.1.1",
-    "@types/node": "^25.0.10",
-    "@types/react": "^19.2.10",
+    "@types/node": "^25.2.0",
+    "@types/react": "^19.2.13",
     "eslint": "^9.39.2",
     "eslint-plugin-react-hooks": "^7.0.1",
     "prettier": "^3.8.1",
