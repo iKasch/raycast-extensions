@@ -12,12 +12,11 @@ type GetAnthropicSummaryProps = {
   setSummary: React.Dispatch<React.SetStateAction<string | undefined>>;
 };
 
-export const useAnthropicSummary = async ({
+export const useAnthropicSummary = ({
   transcript,
   setSummaryIsLoading,
   setSummary,
 }: GetAnthropicSummaryProps) => {
-  const abortController = new AbortController();
   const preferences = getPreferenceValues() as AnthropicPreferences;
   const { anthropicApiToken, language, anthropicModel, creativity } = preferences;
 
@@ -31,9 +30,10 @@ export const useAnthropicSummary = async ({
     return;
   }
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: `abortController ` in dependencies will lead to an error
   useEffect(() => {
     if (!transcript) return;
+
+    const abortController = new AbortController();
 
     const anthropic = new Anthropic({
       apiKey: anthropicApiToken,

@@ -27,12 +27,13 @@ export function useOpenAIFollowUpQuestion({
   const { openaiApiToken, openaiEndpoint, openaiModel, creativity } = preferences;
 
   useEffect(() => {
+    if (!question || !transcript) return;
+
     const abortController = new AbortController();
+    let cancelled = false;
+    const qID = generateQuestionId();
 
     const handleAdditionalQuestion = async () => {
-      if (!question || !transcript) return;
-      const qID = generateQuestionId();
-
       const toast = await showToast({
         style: Toast.Style.Animated,
         title: FINDING_ANSWER.title,
@@ -47,7 +48,7 @@ export function useOpenAIFollowUpQuestion({
         openai.baseURL = openaiEndpoint;
       }
 
-      // Extract summary (first item) and previous Q&A (rest, excluding the new question)
+      // Extract summary (first item) and previous Q&A (rest)
       const summary = questions[0]?.answer || "";
       const previousQA = questions.slice(1).map((q) => ({ question: q.question, answer: q.answer }));
 
@@ -62,7 +63,7 @@ export function useOpenAIFollowUpQuestion({
 
       const messages = buildFollowUpMessages(question, transcript, summary, previousQA);
 
-      const answer = openai.chat.completions.stream(
+      const stream = openai.chat.completions.stream(
         {
           model: openaiModel || OPENAI_MODEL,
           messages,
@@ -71,31 +72,32 @@ export function useOpenAIFollowUpQuestion({
         { signal: abortController.signal },
       );
 
-      answer.on("content", (delta) => {
+      stream.on("content", (delta) => {
+        if (cancelled) return;
         toast.show();
         setQuestions((prevQuestions) =>
           prevQuestions.map((q) => (q.id === qID ? { ...q, answer: q.answer + delta } : q)),
         );
       });
 
-      answer.finalChatCompletion().then(() => {
-        toast.hide();
-        setQuestion("");
-      });
-
-      if (abortController.signal.aborted) return;
-
-      answer.on("error", (error) => {
-        if (abortController.signal.aborted) return;
+      stream.on("error", (error) => {
+        if (cancelled) return;
         toast.style = Toast.Style.Failure;
         toast.title = ALERT.title;
         toast.message = error.message;
+      });
+
+      stream.finalChatCompletion().then(() => {
+        if (cancelled) return;
+        toast.hide();
+        setQuestion("");
       });
     };
 
     handleAdditionalQuestion();
 
     return () => {
+      cancelled = true;
       abortController.abort();
     };
   }, [question, transcript, questions, creativity, openaiApiToken, openaiEndpoint, openaiModel, setQuestion, setQuestions]);

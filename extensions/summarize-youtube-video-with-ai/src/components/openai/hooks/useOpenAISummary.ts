@@ -13,7 +13,6 @@ type GetOpenAISummaryProps = {
 };
 
 export const useOpenAISummary = ({ transcript, setSummaryIsLoading, setSummary }: GetOpenAISummaryProps) => {
-  const abortController = new AbortController();
   const preferences = getPreferenceValues() as OpenAIPreferences;
   const { creativity, openaiApiToken, language, openaiEndpoint, openaiModel } = preferences;
 
@@ -26,9 +25,10 @@ export const useOpenAISummary = ({ transcript, setSummaryIsLoading, setSummary }
     return;
   }
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: `abortController ` in dependencies will lead to an error
   useEffect(() => {
     if (!transcript) return;
+
+    const abortController = new AbortController();
 
     const aiInstructions = getAiInstructionSnippet(language, transcript, transcript);
 

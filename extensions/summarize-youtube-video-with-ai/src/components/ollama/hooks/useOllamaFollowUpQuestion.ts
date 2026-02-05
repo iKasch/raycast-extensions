@@ -27,12 +27,13 @@ export function useOllamaFollowUpQuestion({
   const { ollamaEndpoint, ollamaModel, creativity } = preferences;
 
   useEffect(() => {
+    if (!question || !transcript) return;
+
     const abortController = new AbortController();
+    let cancelled = false;
+    const qID = generateQuestionId();
 
     const handleAdditionalQuestion = async () => {
-      if (!question || !transcript) return;
-      const qID = generateQuestionId();
-
       const toast = await showToast({
         style: Toast.Style.Animated,
         title: FINDING_ANSWER.title,
@@ -59,7 +60,7 @@ export function useOllamaFollowUpQuestion({
 
       const messages = buildFollowUpMessages(question, transcript, summary, previousQA);
 
-      const answer = openai.chat.completions.stream(
+      const stream = openai.chat.completions.stream(
         {
           model: ollamaModel || OLLAMA_MODEL,
           messages,
@@ -69,31 +70,32 @@ export function useOllamaFollowUpQuestion({
         { signal: abortController.signal },
       );
 
-      answer.on("content", (delta) => {
+      stream.on("content", (delta) => {
+        if (cancelled) return;
         toast.show();
         setQuestions((prevQuestions) =>
           prevQuestions.map((q) => (q.id === qID ? { ...q, answer: q.answer + delta } : q)),
         );
       });
 
-      answer.finalChatCompletion().then(() => {
-        toast.hide();
-        setQuestion("");
-      });
-
-      if (abortController.signal.aborted) return;
-
-      answer.on("error", (error) => {
-        if (abortController.signal.aborted) return;
+      stream.on("error", (error) => {
+        if (cancelled) return;
         toast.style = Toast.Style.Failure;
         toast.title = ALERT.title;
         toast.message = error.message;
+      });
+
+      stream.finalChatCompletion().then(() => {
+        if (cancelled) return;
+        toast.hide();
+        setQuestion("");
       });
     };
 
     handleAdditionalQuestion();
 
     return () => {
+      cancelled = true;
       abortController.abort();
     };
   }, [question, transcript, questions, creativity, ollamaEndpoint, ollamaModel, setQuestion, setQuestions]);

@@ -23,15 +23,17 @@ export function useAnthropicFollowUpQuestion({
   question,
   questions,
 }: FollowUpQuestionParams) {
-  const abortController = new AbortController();
   const preferences = getPreferenceValues() as AnthropicPreferences;
   const { anthropicApiToken, anthropicModel, creativity } = preferences;
 
   useEffect(() => {
-    const handleAdditionalQuestion = async () => {
-      if (!question || !transcript) return;
-      const qID = generateQuestionId();
+    if (!question || !transcript) return;
 
+    const abortController = new AbortController();
+    let cancelled = false;
+    const qID = generateQuestionId();
+
+    const handleAdditionalQuestion = async () => {
       const anthropic = new Anthropic({
         apiKey: anthropicApiToken,
       });
@@ -63,7 +65,7 @@ export function useAnthropicFollowUpQuestion({
         content: m.content,
       }));
 
-      const answer = anthropic.messages.stream(
+      const stream = anthropic.messages.stream(
         {
           model: anthropicModel || ANTHROPIC_MODEL,
           max_tokens: 8192,
@@ -75,32 +77,33 @@ export function useAnthropicFollowUpQuestion({
         { signal: abortController.signal },
       );
 
-      answer.on("text", (delta) => {
+      stream.on("text", (delta) => {
+        if (cancelled) return;
         toast.show();
         setQuestions((prevQuestions) =>
           prevQuestions.map((q) => (q.id === qID ? { ...q, answer: (q.answer || "") + delta } : q)),
         );
       });
 
-      answer.finalMessage().then(() => {
-        toast.hide();
-        setQuestion("");
-      });
-
-      if (abortController.signal.aborted) return;
-
-      answer.on("error", (error) => {
-        if (abortController.signal.aborted) return;
+      stream.on("error", (error) => {
+        if (cancelled) return;
         toast.style = Toast.Style.Failure;
         toast.title = ALERT.title;
         toast.message = error instanceof Error ? error.message : "Unknown error occurred";
+      });
+
+      stream.finalMessage().then(() => {
+        if (cancelled) return;
+        toast.hide();
+        setQuestion("");
       });
     };
 
     handleAdditionalQuestion();
 
     return () => {
+      cancelled = true;
       abortController.abort();
     };
-  }, [question, transcript, questions, abortController, anthropicApiToken, anthropicModel, creativity, setQuestion, setQuestions]);
+  }, [question, transcript, questions, anthropicApiToken, anthropicModel, creativity, setQuestion, setQuestions]);
 }

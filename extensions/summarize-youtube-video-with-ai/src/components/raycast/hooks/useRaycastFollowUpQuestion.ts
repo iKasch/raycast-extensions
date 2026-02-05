@@ -21,16 +21,17 @@ export function useRaycastFollowUpQuestion({
   question,
   questions,
 }: FollowUpQuestionParams) {
-  const abortController = new AbortController();
   const preferences = getPreferenceValues() as RaycastPreferences;
   const { creativity } = preferences;
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: `abortController` in dependencies will lead to an error
   useEffect(() => {
-    const handleAdditionalQuestion = async () => {
-      if (!question || !transcript) return;
-      const qID = generateQuestionId();
+    if (!question || !transcript) return;
 
+    const abortController = new AbortController();
+    let cancelled = false;
+    const qID = generateQuestionId();
+
+    const handleAdditionalQuestion = async () => {
       const toast = await showToast({
         style: Toast.Style.Animated,
         title: FINDING_ANSWER.title,
@@ -41,7 +42,7 @@ export function useRaycastFollowUpQuestion({
       const summary = questions[0]?.answer || "";
       const previousQA = questions.slice(1).map((q) => ({ question: q.question, answer: q.answer }));
 
-      const answer = AI.ask(getFollowUpQuestionSnippet(question, transcript, summary, previousQA), {
+      const stream = AI.ask(getFollowUpQuestionSnippet(question, transcript, summary, previousQA), {
         creativity: Number.parseFloat(creativity),
         signal: abortController.signal,
       });
@@ -55,25 +56,25 @@ export function useRaycastFollowUpQuestion({
         ...prevQuestions,
       ]);
 
-      answer.on("data", (data) => {
+      stream.on("data", (data) => {
+        if (cancelled) return;
         toast.show();
-        setQuestions((prevQuestions) => {
-          const updatedQuestions = prevQuestions.map((q) => (q.id === qID ? { ...q, answer: q.answer + data } : q));
-          return updatedQuestions;
-        });
+        setQuestions((prevQuestions) =>
+          prevQuestions.map((q) => (q.id === qID ? { ...q, answer: q.answer + data } : q)),
+        );
       });
 
-      answer.finally(async () => {
+      stream.finally(() => {
+        if (cancelled) return;
         toast.hide();
         setQuestion("");
       });
-
-      if (abortController.signal.aborted) return;
     };
 
     handleAdditionalQuestion();
 
     return () => {
+      cancelled = true;
       abortController.abort();
     };
   }, [question, transcript, questions, creativity, setQuestion, setQuestions]);
