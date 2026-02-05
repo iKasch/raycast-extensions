@@ -11,6 +11,7 @@ type FollowUpQuestionParams = {
   setQuestion: React.Dispatch<React.SetStateAction<string>>;
   transcript: string | undefined;
   question: string;
+  questions: Question[];
 };
 
 export function useRaycastFollowUpQuestion({
@@ -18,12 +19,13 @@ export function useRaycastFollowUpQuestion({
   setQuestion,
   transcript,
   question,
+  questions,
 }: FollowUpQuestionParams) {
   const abortController = new AbortController();
   const preferences = getPreferenceValues() as RaycastPreferences;
   const { creativity } = preferences;
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: `abortController ` in dependencies will lead to an error
+  // biome-ignore lint/correctness/useExhaustiveDependencies: `abortController` in dependencies will lead to an error
   useEffect(() => {
     const handleAdditionalQuestion = async () => {
       if (!question || !transcript) return;
@@ -35,8 +37,12 @@ export function useRaycastFollowUpQuestion({
         message: FINDING_ANSWER.message,
       });
 
-      const answer = AI.ask(getFollowUpQuestionSnippet(question, transcript), {
-        creativity: Number.parseInt(creativity, 10),
+      // Extract summary (first item) and previous Q&A (rest)
+      const summary = questions[0]?.answer || "";
+      const previousQA = questions.slice(1).map((q) => ({ question: q.question, answer: q.answer }));
+
+      const answer = AI.ask(getFollowUpQuestionSnippet(question, transcript, summary, previousQA), {
+        creativity: Number.parseFloat(creativity),
         signal: abortController.signal,
       });
 
@@ -70,5 +76,5 @@ export function useRaycastFollowUpQuestion({
     return () => {
       abortController.abort();
     };
-  }, [question, transcript, creativity, setQuestion, setQuestions]);
+  }, [question, transcript, questions, creativity, setQuestion, setQuestions]);
 }

@@ -44,6 +44,7 @@ export default function SummarizeVideoWithRaycast(
     setQuestion,
     transcript,
     question,
+    questions,
   });
 
   const [historyItem, setHistoryItem] = useState<string | null>(null);
