@@ -43,7 +43,11 @@ export default function FollowUpList({
       message: FINDING_ANSWER.message,
     });
 
-    const answer = AI.ask(getFollowUpQuestionSnippet(questionText, transcript));
+    // Extract summary (first item) and previous Q&A (rest) before updating state
+    const summary = questions[0]?.answer || "";
+    const previousQA = questions.slice(1).map((q) => ({ question: q.question, answer: q.answer }));
+
+    const answer = AI.ask(getFollowUpQuestionSnippet(questionText, transcript, summary, previousQA));
 
     const updatedQuestions = [
       {
