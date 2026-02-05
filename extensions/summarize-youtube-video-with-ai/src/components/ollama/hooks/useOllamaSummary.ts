@@ -1,10 +1,10 @@
 import { Toast, getPreferenceValues, showToast } from "@raycast/api";
-import OpenAI from "openai";
 import { useEffect } from "react";
 import { OLLAMA_MODEL } from "../../../const/defaults";
 import { ALERT, SUCCESS_SUMMARIZING_VIDEO, SUMMARIZING_VIDEO } from "../../../const/toast_messages";
 import type { OllamaPreferences } from "../../../summarizeVideoWithOllama";
 import { getAiInstructionSnippet } from "../../../utils/getAiInstructionSnippets";
+import { getOpenAIClient } from "../../../utils/sdkClients";
 
 type GetOllamaSummaryProps = {
   transcript?: string;
@@ -22,11 +22,7 @@ export const useOllamaSummary = ({ transcript, setSummaryIsLoading, setSummary }
     const abortController = new AbortController();
 
     const aiInstructions = getAiInstructionSnippet(language, transcript, transcript);
-
-    const openai = new OpenAI({
-      baseURL: ollamaEndpoint,
-      apiKey: "ollama", // required but unused by Ollama
-    });
+    const openai = getOpenAIClient("ollama", ollamaEndpoint);
 
     setSummaryIsLoading(true);
 

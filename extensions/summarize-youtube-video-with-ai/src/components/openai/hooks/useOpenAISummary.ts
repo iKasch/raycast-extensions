@@ -1,10 +1,10 @@
 import { Toast, getPreferenceValues, showToast } from "@raycast/api";
-import OpenAI from "openai";
 import { useEffect } from "react";
 import { OPENAI_MODEL } from "../../../const/defaults";
 import { ALERT, SUCCESS_SUMMARIZING_VIDEO, SUMMARIZING_VIDEO } from "../../../const/toast_messages";
 import type { OpenAIPreferences } from "../../../summarizeVideoWithOpenAI";
 import { getAiInstructionSnippet } from "../../../utils/getAiInstructionSnippets";
+import { getOpenAIClient } from "../../../utils/sdkClients";
 
 type GetOpenAISummaryProps = {
   transcript?: string;
@@ -31,14 +31,7 @@ export const useOpenAISummary = ({ transcript, setSummaryIsLoading, setSummary }
     const abortController = new AbortController();
 
     const aiInstructions = getAiInstructionSnippet(language, transcript, transcript);
-
-    const openai = new OpenAI({
-      apiKey: openaiApiToken,
-    });
-
-    if (openaiEndpoint !== "") {
-      openai.baseURL = openaiEndpoint;
-    }
+    const openai = getOpenAIClient(openaiApiToken, openaiEndpoint || undefined);
 
     setSummaryIsLoading(true);
 

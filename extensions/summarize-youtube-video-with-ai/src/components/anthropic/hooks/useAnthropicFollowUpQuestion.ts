@@ -1,5 +1,5 @@
-import Anthropic from "@anthropic-ai/sdk";
 import { getPreferenceValues, showToast, Toast } from "@raycast/api";
+import { getAnthropicClient } from "../../../utils/sdkClients";
 import { useEffect } from "react";
 import { ANTHROPIC_MODEL } from "../../../const/defaults";
 import { ALERT, FINDING_ANSWER } from "../../../const/toast_messages";
@@ -34,9 +34,7 @@ export function useAnthropicFollowUpQuestion({
     const qID = generateQuestionId();
 
     const handleAdditionalQuestion = async () => {
-      const anthropic = new Anthropic({
-        apiKey: anthropicApiToken,
-      });
+      const anthropic = getAnthropicClient(anthropicApiToken);
 
       const toast = await showToast({
         style: Toast.Style.Animated,

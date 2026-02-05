@@ -1,10 +1,10 @@
-import Anthropic from "@anthropic-ai/sdk";
 import { Toast, getPreferenceValues, showToast } from "@raycast/api";
 import { useEffect } from "react";
 import { ANTHROPIC_MODEL } from "../../../const/defaults";
 import { ALERT, SUCCESS_SUMMARIZING_VIDEO, SUMMARIZING_VIDEO } from "../../../const/toast_messages";
 import type { AnthropicPreferences } from "../../../summarizeVideoWithAnthropic";
 import { getAiInstructionSnippet } from "../../../utils/getAiInstructionSnippets";
+import { getAnthropicClient } from "../../../utils/sdkClients";
 
 type GetAnthropicSummaryProps = {
   transcript?: string;
@@ -34,10 +34,7 @@ export const useAnthropicSummary = ({
     if (!transcript) return;
 
     const abortController = new AbortController();
-
-    const anthropic = new Anthropic({
-      apiKey: anthropicApiToken,
-    });
+    const anthropic = getAnthropicClient(anthropicApiToken);
 
     setSummaryIsLoading(true);
 

@@ -1,5 +1,4 @@
 import { getPreferenceValues, showToast, Toast } from "@raycast/api";
-import OpenAI from "openai";
 import { useEffect } from "react";
 import { OLLAMA_MODEL } from "../../../const/defaults";
 import { ALERT, FINDING_ANSWER } from "../../../const/toast_messages";
@@ -7,6 +6,7 @@ import type { Question } from "../../../hooks/useQuestions";
 import type { OllamaPreferences } from "../../../summarizeVideoWithOllama";
 import { generateQuestionId } from "../../../utils/generateQuestionId";
 import { buildFollowUpMessages } from "../../../utils/getAiInstructionSnippets";
+import { getOpenAIClient } from "../../../utils/sdkClients";
 
 type FollowUpQuestionParams = {
   setQuestions: React.Dispatch<React.SetStateAction<Question[]>>;
@@ -40,10 +40,7 @@ export function useOllamaFollowUpQuestion({
         message: FINDING_ANSWER.message,
       });
 
-      const openai = new OpenAI({
-        baseURL: ollamaEndpoint,
-        apiKey: "ollama", // required but unused by Ollama
-      });
+      const openai = getOpenAIClient("ollama", ollamaEndpoint);
 
       // Extract summary (first item) and previous Q&A (rest)
       const summary = questions[0]?.answer || "";

@@ -1,5 +1,4 @@
 import { getPreferenceValues, showToast, Toast } from "@raycast/api";
-import OpenAI from "openai";
 import { useEffect } from "react";
 import { OPENAI_MODEL } from "../../../const/defaults";
 import { ALERT, FINDING_ANSWER } from "../../../const/toast_messages";
@@ -7,6 +6,7 @@ import type { Question } from "../../../hooks/useQuestions";
 import type { OpenAIPreferences } from "../../../summarizeVideoWithOpenAI";
 import { generateQuestionId } from "../../../utils/generateQuestionId";
 import { buildFollowUpMessages } from "../../../utils/getAiInstructionSnippets";
+import { getOpenAIClient } from "../../../utils/sdkClients";
 
 type FollowUpQuestionParams = {
   setQuestions: React.Dispatch<React.SetStateAction<Question[]>>;
@@ -40,13 +40,7 @@ export function useOpenAIFollowUpQuestion({
         message: FINDING_ANSWER.message,
       });
 
-      const openai = new OpenAI({
-        apiKey: openaiApiToken,
-      });
-
-      if (openaiEndpoint !== "") {
-        openai.baseURL = openaiEndpoint;
-      }
+      const openai = getOpenAIClient(openaiApiToken, openaiEndpoint || undefined);
 
       // Extract summary (first item) and previous Q&A (rest)
       const summary = questions[0]?.answer || "";
