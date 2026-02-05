@@ -1,8 +1,8 @@
 /**
- * Manual test for YouTube transcript fetching.
- * Run with: npm run test:transcript
+ * Diagnostic script for YouTube transcript fetching.
+ * Run with: npm run check:youtube-api
  *
- * This test verifies the transcript extraction logic works with current YouTube internals.
+ * Use this to verify transcript extraction still works when YouTube changes its internal API.
  */
 
 // Test video: Anthropic Claude Code announcement

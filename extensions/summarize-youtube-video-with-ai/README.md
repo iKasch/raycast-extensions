@@ -83,3 +83,15 @@ The language you want the summary to be in. Your choice will be used in a prompt
 ## `summarizeVideoHistory`
 
 Every summary is stored in the local database. You can retrieve and interact with the summaries by running the `summarizeVideoHistory` command.
+
+## Troubleshooting
+
+### YouTube Transcript Not Working
+
+YouTube occasionally changes its internal API, which can break transcript fetching. To diagnose whether the issue is with YouTube's API or something else, run:
+
+```bash
+npm run check:youtube-api
+```
+
+This diagnostic script tests the transcript extraction against a known video. If it fails, the YouTube API internals have likely changed and the `getVideoTranscript.ts` utility needs to be updated.
