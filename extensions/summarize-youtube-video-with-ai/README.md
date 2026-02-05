@@ -18,7 +18,7 @@ Choose how creative the AI should be.
 
 The language you want the summary to be in. Your choice will be used in a prompt like this "Answer in english". (default: `english`).
 
-## `summarizeVideoWithOpenAI`
+## `summarizeVideoWithOpenAI`sdfjkh
 
 ### Preferences for OpenAI
 
@@ -36,7 +36,7 @@ Choose the OpenAI endpoint you want to use.
 
 ### OpenAI Model
 
-Choose the model you want to use. (default: `chatgpt-4o-latest`).
+Choose the model you want to use. (default: `gpt-5.1-mini`).
 
 ### Language
 

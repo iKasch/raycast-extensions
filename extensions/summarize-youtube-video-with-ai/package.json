@@ -136,7 +136,7 @@
         {
           "name": "openaiModel",
           "title": "OpenAI Model",
-          "description": "Choose the OpenAI model to use. Defaults to `chatgpt-4o-latest`.",
+          "description": "Choose the OpenAI model to use. Defaults to `gpt-5.1-mini`.",
           "type": "textfield",
           "required": false
         },
