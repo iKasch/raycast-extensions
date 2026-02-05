@@ -6,16 +6,23 @@ import { ALERT, FINDING_ANSWER } from "../../../const/toast_messages";
 import type { Question } from "../../../hooks/useQuestions";
 import type { OllamaPreferences } from "../../../summarizeVideoWithOllama";
 import { generateQuestionId } from "../../../utils/generateQuestionId";
-import { getFollowUpQuestionSnippet } from "../../../utils/getAiInstructionSnippets";
+import { buildFollowUpMessages } from "../../../utils/getAiInstructionSnippets";
 
 type FollowUpQuestionParams = {
   setQuestions: React.Dispatch<React.SetStateAction<Question[]>>;
   setQuestion: React.Dispatch<React.SetStateAction<string>>;
   transcript: string | undefined;
   question: string;
+  questions: Question[];
 };
 
-export function useOllamaFollowUpQuestion({ setQuestions, setQuestion, transcript, question }: FollowUpQuestionParams) {
+export function useOllamaFollowUpQuestion({
+  setQuestions,
+  setQuestion,
+  transcript,
+  question,
+  questions,
+}: FollowUpQuestionParams) {
   const preferences = getPreferenceValues() as OllamaPreferences;
   const { ollamaEndpoint, ollamaModel, creativity } = preferences;
 
@@ -37,6 +44,10 @@ export function useOllamaFollowUpQuestion({ setQuestions, setQuestion, transcrip
         apiKey: "ollama", // required but unused by Ollama
       });
 
+      // Extract summary (first item) and previous Q&A (rest)
+      const summary = questions[0]?.answer || "";
+      const previousQA = questions.slice(1).map((q) => ({ question: q.question, answer: q.answer }));
+
       setQuestions((prevQuestions) => [
         {
           id: qID,
@@ -46,12 +57,14 @@ export function useOllamaFollowUpQuestion({ setQuestions, setQuestion, transcrip
         ...prevQuestions,
       ]);
 
+      const messages = buildFollowUpMessages(question, transcript, summary, previousQA);
+
       const answer = openai.chat.completions.stream(
         {
           model: ollamaModel || OLLAMA_MODEL,
-          messages: [{ role: "user", content: getFollowUpQuestionSnippet(question, transcript) }],
+          messages,
           stream: true,
-          creativity: Number.parseInt(creativity, 10),
+          temperature: Number.parseFloat(creativity),
         },
         { signal: abortController.signal },
       );
@@ -83,5 +96,5 @@ export function useOllamaFollowUpQuestion({ setQuestions, setQuestion, transcrip
     return () => {
       abortController.abort();
     };
-  }, [question, transcript, creativity, ollamaEndpoint, ollamaModel, setQuestion, setQuestions]);
+  }, [question, transcript, questions, creativity, ollamaEndpoint, ollamaModel, setQuestion, setQuestions]);
 }
