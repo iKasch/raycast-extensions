@@ -6,13 +6,14 @@ import { ALERT, FINDING_ANSWER } from "../../../const/toast_messages";
 import type { Question } from "../../../hooks/useQuestions";
 import type { AnthropicPreferences } from "../../../summarizeVideoWithAnthropic";
 import { generateQuestionId } from "../../../utils/generateQuestionId";
-import { getFollowUpQuestionSnippet } from "../../../utils/getAiInstructionSnippets";
+import { buildFollowUpMessages } from "../../../utils/getAiInstructionSnippets";
 
 type FollowUpQuestionParams = {
   setQuestions: React.Dispatch<React.SetStateAction<Question[]>>;
   setQuestion: React.Dispatch<React.SetStateAction<string>>;
   transcript: string | undefined;
   question: string;
+  questions: Question[];
 };
 
 export function useAnthropicFollowUpQuestion({
@@ -20,6 +21,7 @@ export function useAnthropicFollowUpQuestion({
   setQuestion,
   transcript,
   question,
+  questions,
 }: FollowUpQuestionParams) {
   const abortController = new AbortController();
   const preferences = getPreferenceValues() as AnthropicPreferences;
@@ -40,6 +42,10 @@ export function useAnthropicFollowUpQuestion({
         message: FINDING_ANSWER.message,
       });
 
+      // Extract summary (first item) and previous Q&A (rest)
+      const summary = questions[0]?.answer || "";
+      const previousQA = questions.slice(1).map((q) => ({ question: q.question, answer: q.answer }));
+
       setQuestions((prevQuestions) => [
         {
           id: qID,
@@ -49,13 +55,22 @@ export function useAnthropicFollowUpQuestion({
         ...prevQuestions,
       ]);
 
+      const messages = buildFollowUpMessages(question, transcript, summary, previousQA);
+      // Anthropic uses separate system parameter, so extract it
+      const systemMessage = messages[0].content;
+      const chatMessages = messages.slice(1).map((m) => ({
+        role: m.role as "user" | "assistant",
+        content: m.content,
+      }));
+
       const answer = anthropic.messages.stream(
         {
           model: anthropicModel || ANTHROPIC_MODEL,
           max_tokens: 8192,
           stream: true,
-          messages: [{ role: "user", content: getFollowUpQuestionSnippet(question, transcript) }],
-          temperature: Number.parseInt(creativity, 10),
+          system: systemMessage,
+          messages: chatMessages,
+          temperature: Number.parseFloat(creativity),
         },
         { signal: abortController.signal },
       );
@@ -87,5 +102,5 @@ export function useAnthropicFollowUpQuestion({
     return () => {
       abortController.abort();
     };
-  }, [question, transcript, abortController, anthropicApiToken, anthropicModel, creativity, setQuestion, setQuestions]);
+  }, [question, transcript, questions, abortController, anthropicApiToken, anthropicModel, creativity, setQuestion, setQuestions]);
 }

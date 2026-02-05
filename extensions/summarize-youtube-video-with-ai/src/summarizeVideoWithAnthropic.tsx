@@ -46,6 +46,7 @@ export default function SummarizeVideoWithAnthropic(
     setQuestion,
     transcript,
     question,
+    questions,
   });
 
   const [historyItem, setHistoryItem] = useState<string | null>(null);
