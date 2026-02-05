@@ -53,7 +53,11 @@ export default function FollowUpList({
         toast.show();
         isFirstChunk = false;
       }
-      setQuestions((prev) => prev.map((q) => (q.id === qID ? { ...q, answer: q.answer + data } : q)));
+      setQuestions((prev) => {
+        const updated = prev.slice();
+        updated[0] = { ...updated[0], answer: updated[0].answer + data };
+        return updated;
+      });
     });
 
     stream.finally(() => {
