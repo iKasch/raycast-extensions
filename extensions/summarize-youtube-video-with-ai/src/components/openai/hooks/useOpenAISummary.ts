@@ -50,7 +50,6 @@ export const useOpenAISummary = ({ transcript, setSummaryIsLoading, setSummary }
 
     const stream = openai.chat.completions.stream({
       model: openaiModel || OPENAI_MODEL,
-      temperature: Number.parseInt(creativity),
       messages: [{ role: "user", content: aiInstructions }],
       stream: true,
     });

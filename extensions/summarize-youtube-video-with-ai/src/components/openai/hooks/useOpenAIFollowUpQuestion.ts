@@ -6,16 +6,23 @@ import { ALERT, FINDING_ANSWER } from "../../../const/toast_messages";
 import type { Question } from "../../../hooks/useQuestions";
 import type { OpenAIPreferences } from "../../../summarizeVideoWithOpenAI";
 import { generateQuestionId } from "../../../utils/generateQuestionId";
-import { getFollowUpQuestionSnippet } from "../../../utils/getAiInstructionSnippets";
+import { buildFollowUpMessages } from "../../../utils/getAiInstructionSnippets";
 
 type FollowUpQuestionParams = {
   setQuestions: React.Dispatch<React.SetStateAction<Question[]>>;
   setQuestion: React.Dispatch<React.SetStateAction<string>>;
   transcript: string | undefined;
   question: string;
+  questions: Question[];
 };
 
-export function useOpenAIFollowUpQuestion({ setQuestions, setQuestion, transcript, question }: FollowUpQuestionParams) {
+export function useOpenAIFollowUpQuestion({
+  setQuestions,
+  setQuestion,
+  transcript,
+  question,
+  questions,
+}: FollowUpQuestionParams) {
   const preferences = getPreferenceValues() as OpenAIPreferences;
   const { openaiApiToken, openaiEndpoint, openaiModel, creativity } = preferences;
 
@@ -40,6 +47,10 @@ export function useOpenAIFollowUpQuestion({ setQuestions, setQuestion, transcrip
         openai.baseURL = openaiEndpoint;
       }
 
+      // Extract summary (first item) and previous Q&A (rest, excluding the new question)
+      const summary = questions[0]?.answer || "";
+      const previousQA = questions.slice(1).map((q) => ({ question: q.question, answer: q.answer }));
+
       setQuestions((prevQuestions) => [
         {
           id: qID,
@@ -49,12 +60,13 @@ export function useOpenAIFollowUpQuestion({ setQuestions, setQuestion, transcrip
         ...prevQuestions,
       ]);
 
+      const messages = buildFollowUpMessages(question, transcript, summary, previousQA);
+
       const answer = openai.chat.completions.stream(
         {
           model: openaiModel || OPENAI_MODEL,
-          messages: [{ role: "user", content: getFollowUpQuestionSnippet(question, transcript) }],
+          messages,
           stream: true,
-          creativity: Number.parseInt(creativity, 10),
         },
         { signal: abortController.signal },
       );
@@ -86,5 +98,5 @@ export function useOpenAIFollowUpQuestion({ setQuestions, setQuestion, transcrip
     return () => {
       abortController.abort();
     };
-  }, [question, transcript, creativity, openaiApiToken, openaiEndpoint, openaiModel, setQuestion, setQuestions]);
+  }, [question, transcript, questions, creativity, openaiApiToken, openaiEndpoint, openaiModel, setQuestion, setQuestions]);
 }
