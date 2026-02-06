@@ -1,6 +1,6 @@
 # Summarize YouTube Video Changelog
 
-## [Chore] - {PR_MERGE_DATE}
+## [Chore] - 2026-02-06
 
 - Moved AbortController inside useEffect
 - Parallelized video data and transcript fetching
