@@ -82,7 +82,7 @@ function parseTranscriptXml(xml: string): string {
   // Fall back to srv1 format (<text> tags)
   const textSegments = xml.match(/<text[^>]*>[\s\S]*?<\/text>/g);
 
-  const segments = pSegments?.length ? pSegments : textSegments ?? [];
+  const segments = pSegments?.length ? pSegments : (textSegments ?? []);
 
   return segments
     .map((segment: string) => {
