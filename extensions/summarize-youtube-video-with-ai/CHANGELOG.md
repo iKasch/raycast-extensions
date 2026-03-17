@@ -1,6 +1,6 @@
 # Summarize YouTube Video Changelog
 
-## [Fix] - {PR_MERGE_DATE}
+## [Fix] - 2026-03-17
 
 - 🔧 Fix transcript fetching
 
