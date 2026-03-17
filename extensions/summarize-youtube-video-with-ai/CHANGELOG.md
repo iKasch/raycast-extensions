@@ -1,5 +1,9 @@
 # Summarize YouTube Video Changelog
 
+## [Fix] - {PR_MERGE_DATE}
+
+- 🔧 Fix transcript fetching
+
 ## [Chore] - 2026-02-06
 
 - Moved AbortController inside useEffect
