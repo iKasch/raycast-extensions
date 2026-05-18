@@ -6,34 +6,23 @@ function trimUrlCandidate(value: string) {
   return value.trim().replace(/[.,;:!?]+$/, "");
 }
 
-function getYouTubeVideoIdFromText(text: string): string | undefined {
-  return text
-    .split(/\s+/)
-    .map(trimUrlCandidate)
-    .find((part) => ytdl.validateID(part));
+export function getYouTubeVideoUrl(video: string | undefined | null): string | undefined {
+  if (!video) return undefined;
+
+  try {
+    const videoId = ytdl.getVideoID(trimUrlCandidate(video));
+    return `https://www.youtube.com/watch?v=${videoId}`;
+  } catch {
+    return undefined;
+  }
 }
 
 export function getYouTubeVideoUrlFromText(text: string | undefined | null): string | undefined {
   if (!text) return undefined;
 
-  const trimmed = trimUrlCandidate(text);
-
-  if (ytdl.validateURL(trimmed)) return trimmed;
-  if (ytdl.validateID(trimmed)) return `https://www.youtube.com/watch?v=${trimmed}`;
-
-  const url = (text.match(URL_PATTERN) ?? []).map(trimUrlCandidate).find((candidate) => ytdl.validateURL(candidate));
-  if (url) return url;
-
-  const videoId = getYouTubeVideoIdFromText(text);
-  return videoId ? `https://www.youtube.com/watch?v=${videoId}` : undefined;
+  return (text.match(URL_PATTERN) ?? []).map(getYouTubeVideoUrl).find(Boolean);
 }
 
 export function removeYouTubeVideoReferenceFromText(text: string): string {
-  return text
-    .replace(URL_PATTERN, " ")
-    .split(/\s+/)
-    .map(trimUrlCandidate)
-    .filter((part) => part && !ytdl.validateID(part))
-    .join(" ")
-    .trim();
+  return text.replace(URL_PATTERN, " ").replace(/\s+/g, " ").trim();
 }

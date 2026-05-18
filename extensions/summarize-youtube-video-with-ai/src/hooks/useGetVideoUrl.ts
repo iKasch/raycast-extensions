@@ -5,7 +5,7 @@ import {
   GETTING_VIDEO_URL_FROM_BROWSER,
   GETTING_VIDEO_URL_FROM_CLIPBOARD,
 } from "../const/toast_messages";
-import { getYouTubeVideoUrlFromText } from "../utils/youtubeUrl";
+import { getYouTubeVideoUrl } from "../utils/youtubeUrl";
 
 export const useGetVideoUrl = ({
   input,
@@ -22,7 +22,7 @@ export const useGetVideoUrl = ({
         message: GETTING_VIDEO_URL.message,
       });
 
-      const inputVideoUrl = getYouTubeVideoUrlFromText(input);
+      const inputVideoUrl = getYouTubeVideoUrl(input);
 
       if (inputVideoUrl) {
         setVideoURL(inputVideoUrl);
@@ -30,7 +30,7 @@ export const useGetVideoUrl = ({
       }
 
       const clipboardText = await Clipboard.readText();
-      const clipboardVideoUrl = getYouTubeVideoUrlFromText(clipboardText);
+      const clipboardVideoUrl = getYouTubeVideoUrl(clipboardText);
 
       if (!input && clipboardVideoUrl) {
         showToast({
@@ -45,7 +45,7 @@ export const useGetVideoUrl = ({
       if (!input && environment.canAccess(BrowserExtension)) {
         const tabs = await BrowserExtension.getTabs();
         const activeTabVideoUrl = tabs.find((tab) => tab.active)?.url;
-        const browserVideoUrl = getYouTubeVideoUrlFromText(activeTabVideoUrl);
+        const browserVideoUrl = getYouTubeVideoUrl(activeTabVideoUrl);
         if (browserVideoUrl) {
           showToast({
             style: Toast.Style.Animated,

@@ -4,7 +4,11 @@ import type { VideoDataTypes } from "../utils/getVideoData";
 import { getVideoData } from "../utils/getVideoData";
 import { getVideoQuestionAnswerSnippet } from "../utils/getAiInstructionSnippets";
 import { fetchTranscript } from "../utils/transcriptFetcher";
-import { getYouTubeVideoUrlFromText, removeYouTubeVideoReferenceFromText } from "../utils/youtubeUrl";
+import {
+  getYouTubeVideoUrl,
+  getYouTubeVideoUrlFromText,
+  removeYouTubeVideoReferenceFromText,
+} from "../utils/youtubeUrl";
 
 (globalThis.fetch as typeof globalThis.fetch) = nodeFetch as never;
 
@@ -19,11 +23,6 @@ type Input = {
   video?: string;
 };
 
-type Preferences = {
-  creativity?: "0" | "0.5" | "1" | "1.5" | "2";
-  language?: string;
-};
-
 type VideoResolution = {
   url: string;
   question: string;
@@ -35,17 +34,17 @@ async function getActiveBrowserVideoUrl(): Promise<string | undefined> {
   const tabs = await BrowserExtension.getTabs();
   const activeTabUrl = tabs.find((tab) => tab.active)?.url;
 
-  return getYouTubeVideoUrlFromText(activeTabUrl);
+  return getYouTubeVideoUrl(activeTabUrl);
 }
 
 async function resolveVideo(input: Input): Promise<VideoResolution> {
   const clipboardText = await Clipboard.readText();
   const activeBrowserVideoUrl = await getActiveBrowserVideoUrl();
   const videoUrl =
-    getYouTubeVideoUrlFromText(input.video) ??
+    getYouTubeVideoUrl(input.video) ??
     getYouTubeVideoUrlFromText(input.question) ??
     activeBrowserVideoUrl ??
-    getYouTubeVideoUrlFromText(clipboardText);
+    getYouTubeVideoUrl(clipboardText);
 
   if (!videoUrl) {
     throw new Error("Please provide a YouTube URL in your prompt or copy one to the clipboard.");
