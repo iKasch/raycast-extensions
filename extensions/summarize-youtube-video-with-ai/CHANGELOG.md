@@ -1,6 +1,6 @@
 # Summarize YouTube Video Changelog
 
-## [Feature] - {PR_MERGE_DATE}
+## [Feature] - 2026-05-19
 
 - Add a Raycast AI tool to answer questions about YouTube videos from their transcript
 
